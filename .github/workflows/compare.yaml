@@ -13,36 +13,24 @@ jobs:
     steps:
       - name: Get repo contents
         uses: actions/checkout@v3
-
+        with:
+          ref: refs/pull/${{ github.event.issue.number }}/head
       - name: install dependencies
-        run: pip install ghapi wandb
+        run: pip install ghapi wandb wandb-workspaces
 
-      - name: Parse value from the command
-        id: get-runid-value
-        shell: python
-        run: |
-          import re, os
-          comment = os.getenv('PR_COMMENT', '')
-          match = re.search('/compare_runs[\s+](\S+)', comment)
-
-          with open(os.environ['GITHUB_OUTPUT'], 'a') as f:
-            if match:
-              print(f'VAL_FOUND=true', file=f)
-              print(f'RUN_ID={match.group(1)}', file=f)
-            else:
-              print(f'VAL_FOUND=false', file=f)
+      - name: Run script
+        run: python ./scripts/create_wandb_run.py 1.5
         env:
-          PR_COMMENT: ${{ github.event.comment.body }}
+          WANDB_ENTITY: fschmitt-red-hat
+          WANDB_PROJECT: cicd_demo
+          WANDB_API_KEY: ${{ secrets.WANDB_API_KEY }}
 
       - name: Generate the comparison report
-        if: steps.get-runid-value.outputs.VAL_FOUND == 'true'
         id: wandb-report
-        run: python ./client/compare_runs.py
+        run: python ./scripts/create_wandb_report.py
         env:
-          WANDB_ENTITY: hamelsmu
+          WANDB_ENTITY: fschmitt-red-hat
           WANDB_PROJECT: cicd_demo
-          BASELINE_TAG: baseline
-          RUN_ID: "${{ steps.get-runid-value.outputs.RUN_ID }}"
           WANDB_API_KEY: ${{ secrets.WANDB_API_KEY }}
 
       - name: Make a comment with the GitHub API
@@ -59,17 +47,3 @@ jobs:
              });
         env:
           REPORT_URL: "${{ steps.wandb-report.outputs.REPORT_URL }}"
-
-      # This next step if for an advanced version of the workflow
-      - name: Advanced- label the PR
-        uses: actions/github-script@v6
-        if: steps.wandb-report.outcome == 'success'
-        with:
-          github-token: ${{ secrets.MY_PAT }} # We have to use our own token because we want to trigger another action
-          script: |
-            github.rest.issues.addLabels({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              labels: ["experiment-linked"]
-             });
