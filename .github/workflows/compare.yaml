@@ -18,6 +18,20 @@ jobs:
       - name: install dependencies
         run: pip install ghapi wandb wandb-workspaces
 
+      - name: React to the comment
+        run: |
+          import os
+          from ghapi.all import GhApi
+
+          api = GhApi(owner="fschmitt-red-hat", repo="cicd_demo")
+          api.reactions.create_for_issue_comment(
+              comment_id=os.environ["COMMENT_ID"], content="rocket"
+          )
+        shell: python
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          COMMENT_ID: ${{ github.event.comment.id }}
+
       - name: Run script
         run: python ./scripts/create_wandb_run.py 1.5
         env:
