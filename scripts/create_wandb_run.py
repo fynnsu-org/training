@@ -13,7 +13,7 @@ def main(entity: str, project: str, starting_value: float, tags: list[str]):
     run = wandb.init(entity=entity, project=project)
 
     for i in range(10):
-        run.log({"loss": starting_value - 0.1 * i})
+        run.log({"loss": starting_value - 0.13 * i})
 
     run.tags = run.tags + tuple(tags) + (get_git_revision_hash(),)
     time.sleep(1)
