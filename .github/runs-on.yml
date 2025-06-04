@@ -1,3 +1,4 @@
 images:
   e2e_runner_ami:
+    owner: "851725220677"
     ami: "ami-0d5fc5198e1fd429a"
