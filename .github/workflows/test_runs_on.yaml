@@ -5,7 +5,7 @@ name: Test runs-on
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0,30 * * * *'
+    - cron: '0 */4 * * *'
 
 jobs:
   this-uses-runs-on:
