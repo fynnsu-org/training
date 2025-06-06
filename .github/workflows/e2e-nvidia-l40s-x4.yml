@@ -34,10 +34,10 @@ jobs:
         with:
           egress-policy: audit
 
-      - name: Checkout instructlab/training
+      - name: Checkout fynnsu-org/training
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
-          repository: "instructlab/training"
+          repository: "fynnsu-org/training"
           path: "training"
           # https://github.com/actions/checkout/issues/249
           fetch-depth: 0
