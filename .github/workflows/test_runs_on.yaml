@@ -24,3 +24,21 @@ jobs:
         run: echo "Hello world"
       - name: smi
         run: nvidia-smi
+  
+  
+  this-uses-runs-on-us-east-2:
+    runs-on: 
+      - runs-on=${{ github.run_id }}
+      - family=g6e.12xlarge
+      - region=us-east-2
+      - ami=ami-0ac695c51e366938c
+    steps:
+      - name: Checkout instructlab/training
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          fetch-depth: 0
+
+      - name: ECHO
+        run: echo "Hello world"
+      - name: smi
+        run: nvidia-smi
